@@ -1,0 +1,18 @@
+# PyTorch with CUDA support for RTX 3050
+# IMPORTANT: Install PyTorch separately FIRST using one of these commands:
+# 
+# For CUDA 12.6 (RECOMMENDED - Latest Stable):
+#   pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+#
+# For CUDA 12.1 (Alternative):
+#   pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+#
+# For CUDA 11.8 (Older but stable):
+#   pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# Vision and Audio tools
+opencv-python
+mediapipe
+openai-whisper
+transformers
+flask

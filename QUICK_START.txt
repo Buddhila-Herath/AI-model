@@ -1,0 +1,53 @@
+================================================================================
+                    QUICK INSTALLATION REFERENCE CARD
+================================================================================
+
+WHAT TO INSTALL:
+----------------
+1. Python 3.12.x          → https://www.python.org/downloads/
+   ⚠️ CHECK "Add Python to PATH" during installation!
+
+2. CUDA Toolkit 12.6      → https://developer.nvidia.com/cuda-downloads
+   (Select: Windows > x86_64 > Windows 10/11 > exe installer)
+
+3. Visual Studio Code      → https://code.visualstudio.com/
+   (Then install "Python" extension by Microsoft)
+
+================================================================================
+
+AFTER INSTALLATION - RUN THESE COMMANDS:
+----------------------------------------
+
+# 1. Open Command Prompt and go to project folder
+cd Documents\VivaAIProject
+
+# 2. Activate virtual environment
+venv\Scripts\activate
+
+# 3. Install PyTorch with CUDA 12.6 (RECOMMENDED)
+pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu126
+
+# 4. Install other dependencies
+pip install -r requirements.txt
+
+# 5. Test your GPU
+python check_gpu.py
+
+================================================================================
+
+EXPECTED OUTPUT FROM check_gpu.py:
+-----------------------------------
+--- GPU CHECK ---
+Success! Your RTX 3050 is detected.
+Device name: NVIDIA GeForce RTX 3050
+
+================================================================================
+
+IF SOMETHING GOES WRONG:
+------------------------
+- See INSTALLATION_GUIDE.md for detailed troubleshooting
+- Make sure Python is in PATH: python --version
+- Check CUDA: nvcc --version
+- Check GPU driver: nvidia-smi
+
+================================================================================
