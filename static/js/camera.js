@@ -178,6 +178,7 @@ function displayResults(data) {
     const components = data.component_scores || {};
     setScoreBar("eye-contact", components.eye_contact);
     setScoreBar("head-stability", components.head_stability);
+    setScoreBar("blink", components.blink_behaviour);
     setScoreBar("fluency", components.fluency);
     setScoreBar("clarity", components.clarity);
     setScoreBar("filler", components.filler_penalty);
@@ -218,6 +219,22 @@ function displayResults(data) {
     document.getElementById("stat-wpm").textContent = meta.words_per_minute || "--";
     document.getElementById("stat-duration").textContent = meta.audio_duration_seconds || "--";
     document.getElementById("stat-fillers").textContent = meta.filler_word_count || "0";
+
+    // Blink / EAR stats
+    document.getElementById("stat-blinks").textContent = meta.total_blinks ?? "--";
+    document.getElementById("stat-bpm").textContent =
+        meta.blinks_per_minute != null ? meta.blinks_per_minute.toFixed(1) : "--";
+    document.getElementById("stat-avg-ear").textContent =
+        meta.avg_ear != null ? meta.avg_ear.toFixed(3) : "--";
+    document.getElementById("stat-blink-dur").textContent =
+        meta.avg_blink_duration_ms != null ? meta.avg_blink_duration_ms.toFixed(0) : "--";
+
+    const statusMap = { normal: "Normal", low: "Low", high: "High" };
+    const statusEl = document.getElementById("stat-blink-status");
+    const status = meta.blink_rate_status || "normal";
+    statusEl.textContent = statusMap[status] || status;
+    statusEl.style.color =
+        status === "normal" ? "#2ecc71" : status === "high" ? "#e74c3c" : "#f39c12";
 }
 
 function setScoreBar(id, value) {

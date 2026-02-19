@@ -15,10 +15,11 @@ logger = logging.getLogger(__name__)
 
 # Default weights for final score calculation (must sum to 1.0)
 DEFAULT_WEIGHTS = {
-    "eye_contact": 0.20,
-    "head_stability": 0.10,
-    "fluency": 0.30,
-    "clarity": 0.20,
+    "eye_contact": 0.18,
+    "head_stability": 0.08,
+    "blink_behaviour": 0.07,
+    "fluency": 0.28,
+    "clarity": 0.19,
     "filler_penalty": 0.10,
     "pace": 0.10,
 }
@@ -111,9 +112,13 @@ class FusionEngine:
         wpm = audio.get("words_per_minute", 0)
         pace_score = self._pace_score(wpm)
 
+        # Blink behaviour score (normal ~15-20 bpm is ideal)
+        blink_score = self._blink_score(vision.get("blink_summary", {}))
+
         return {
             "eye_contact": round(eye_contact, 2),
             "head_stability": round(head_stability, 2),
+            "blink_behaviour": round(blink_score, 2),
             "fluency": round(fluency, 2),
             "clarity": round(clarity, 2),
             "filler_penalty": round(np.clip(filler_score, 0, 100), 2),
@@ -136,6 +141,40 @@ class FusionEngine:
             return 60 + (200 - wpm) * 1.0
         else:
             return max(0, 40 - abs(wpm - 135) * 0.3)
+
+    def _blink_score(self, blink_summary):
+        """
+        Score blink behaviour.  Normal relaxed blink rate is ~15-20/min.
+        Very low (<8) may indicate staring / stress; very high (>35) may
+        indicate anxiety or fatigue.  Avg blink duration ~100-400 ms is normal.
+        """
+        bpm = blink_summary.get("blinks_per_minute", 0)
+        avg_dur = blink_summary.get("avg_blink_duration_ms", 200)
+
+        if bpm <= 0:
+            return 50.0  # no blink data (e.g. no face detected)
+
+        # Rate component (peak 100 at 15-20 bpm, decays outward)
+        if 12 <= bpm <= 22:
+            rate_score = 100.0
+        elif 8 <= bpm < 12:
+            rate_score = 70 + (bpm - 8) * 7.5
+        elif 22 < bpm <= 30:
+            rate_score = 70 + (30 - bpm) * 3.75
+        elif bpm < 8:
+            rate_score = max(30, 70 - (8 - bpm) * 10)
+        else:
+            rate_score = max(20, 70 - (bpm - 30) * 5)
+
+        # Duration component (normal blink ~100-400 ms)
+        if 80 <= avg_dur <= 400:
+            dur_score = 100.0
+        elif avg_dur < 80:
+            dur_score = 70.0
+        else:
+            dur_score = max(40, 100 - (avg_dur - 400) * 0.15)
+
+        return np.clip(rate_score * 0.7 + dur_score * 0.3, 0, 100)
 
     def _weighted_score(self, components):
         """Compute the weighted overall score."""
@@ -203,6 +242,27 @@ class FusionEngine:
         elif wpm < 80 and wpm > 0:
             improvements.append(f"Speaking too slow ({wpm:.0f} wpm). Aim for 120-150 wpm")
 
+        # Blink behaviour feedback
+        blink_summary = vision.get("blink_summary", {})
+        bpm = blink_summary.get("blinks_per_minute", 0)
+        blink_status = blink_summary.get("blink_rate_status", "normal")
+        bb = components.get("blink_behaviour", 50)
+
+        if bb >= 80:
+            strengths.append(
+                f"Natural blink rate ({bpm:.0f}/min) suggesting calm composure"
+            )
+        elif blink_status == "low" and bpm > 0:
+            improvements.append(
+                f"Very low blink rate ({bpm:.0f}/min) - this may indicate "
+                "staring or tension. Try to relax your eyes"
+            )
+        elif blink_status == "high":
+            improvements.append(
+                f"Elevated blink rate ({bpm:.0f}/min) - may indicate nervousness. "
+                "Practice deep breathing before your viva"
+            )
+
         # Clarity feedback
         cl = components["clarity"]
         if cl >= 80:
@@ -248,6 +308,7 @@ class FusionEngine:
                 "head_stability_score": vision_result.get("head_stability_score"),
                 "face_detected_ratio": vision_result.get("face_detected_ratio"),
                 "frame_count": vision_result.get("frame_count"),
+                "blink_summary": vision_result.get("blink_summary", {}),
             },
             "audio_summary": {
                 "word_count": audio_result.get("word_count"),

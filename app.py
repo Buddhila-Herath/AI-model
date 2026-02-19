@@ -135,6 +135,16 @@ def analyze():
             vision_result = {
                 "eye_contact_score": 0,
                 "head_stability_score": 0,
+                "blink_summary": {
+                    "total_blinks": 0,
+                    "blinks_per_minute": 0.0,
+                    "blink_rate_status": "normal",
+                    "avg_ear": 0.0,
+                    "ear_std": 0.0,
+                    "avg_blink_duration_ms": 0.0,
+                    "ear_trend": {},
+                    "blink_timestamps_ms": [],
+                },
                 "emotion_scores": {},
                 "frame_count": 0,
                 "face_detected_ratio": 0,
@@ -152,6 +162,15 @@ def analyze():
         final_result["metadata"]["words_per_minute"] = audio_result.get("words_per_minute", 0)
         final_result["metadata"]["audio_duration_seconds"] = audio_result.get("duration_seconds", 0)
         final_result["metadata"]["filler_word_count"] = audio_result.get("filler_word_count", 0)
+
+        # Blink / EAR metrics
+        blink = vision_result.get("blink_summary", {})
+        final_result["metadata"]["total_blinks"] = blink.get("total_blinks", 0)
+        final_result["metadata"]["blinks_per_minute"] = blink.get("blinks_per_minute", 0)
+        final_result["metadata"]["blink_rate_status"] = blink.get("blink_rate_status", "normal")
+        final_result["metadata"]["avg_ear"] = blink.get("avg_ear", 0)
+        final_result["metadata"]["avg_blink_duration_ms"] = blink.get("avg_blink_duration_ms", 0)
+        final_result["metadata"]["ear_trend"] = blink.get("ear_trend", {})
 
         elapsed = time.time() - start_time
         final_result["metadata"]["total_processing_time"] = round(elapsed, 2)
