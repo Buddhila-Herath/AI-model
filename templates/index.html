@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viva AI - Performance Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Viva AI Performance Analyzer</h1>
+            <p class="subtitle">AI-Powered Viva Voce Assessment using Computer Vision &amp; Speech Analysis</p>
+        </header>
+
+        <main>
+            <!-- Upload / Record Section -->
+            <section class="card" id="input-section">
+                <h2>Upload Recording</h2>
+                <p>Upload a video recording of your viva presentation for AI analysis.</p>
+
+                <div class="upload-area" id="upload-area">
+                    <div class="upload-icon">&#128249;</div>
+                    <p>Drag &amp; drop your video here, or click to browse</p>
+                    <p class="upload-hint">Supported formats: MP4, AVI, MOV, WebM</p>
+                    <input type="file" id="file-input" accept="video/*,audio/*" hidden>
+                </div>
+
+                <div class="file-info" id="file-info" style="display:none;">
+                    <span id="file-name"></span>
+                    <button class="btn-small" id="clear-file">Remove</button>
+                </div>
+
+                <button class="btn-primary" id="analyze-btn" disabled>Analyze Recording</button>
+            </section>
+
+            <!-- Processing Indicator -->
+            <section class="card" id="processing-section" style="display:none;">
+                <h2>Analyzing...</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <p class="status-text" id="status-text">Uploading file...</p>
+            </section>
+
+            <!-- Results Section -->
+            <section class="card" id="results-section" style="display:none;">
+                <h2>Analysis Results</h2>
+
+                <!-- Overall Score -->
+                <div class="score-overview">
+                    <div class="overall-score">
+                        <div class="score-circle" id="overall-circle">
+                            <span class="score-value" id="overall-score">--</span>
+                            <span class="score-label">Overall</span>
+                        </div>
+                        <div class="grade-badge" id="grade-badge">--</div>
+                    </div>
+                </div>
+
+                <!-- Component Scores -->
+                <div class="scores-grid">
+                    <div class="score-card">
+                        <h3>Eye Contact</h3>
+                        <div class="score-bar-container">
+                            <div class="score-bar" id="bar-eye-contact"></div>
+                        </div>
+                        <span class="score-num" id="score-eye-contact">--</span>
+                    </div>
+                    <div class="score-card">
+                        <h3>Head Stability</h3>
+                        <div class="score-bar-container">
+                            <div class="score-bar" id="bar-head-stability"></div>
+                        </div>
+                        <span class="score-num" id="score-head-stability">--</span>
+                    </div>
+                    <div class="score-card">
+                        <h3>Speech Fluency</h3>
+                        <div class="score-bar-container">
+                            <div class="score-bar" id="bar-fluency"></div>
+                        </div>
+                        <span class="score-num" id="score-fluency">--</span>
+                    </div>
+                    <div class="score-card">
+                        <h3>Speech Clarity</h3>
+                        <div class="score-bar-container">
+                            <div class="score-bar" id="bar-clarity"></div>
+                        </div>
+                        <span class="score-num" id="score-clarity">--</span>
+                    </div>
+                    <div class="score-card">
+                        <h3>Filler Words</h3>
+                        <div class="score-bar-container">
+                            <div class="score-bar" id="bar-filler"></div>
+                        </div>
+                        <span class="score-num" id="score-filler">--</span>
+                    </div>
+                    <div class="score-card">
+                        <h3>Speaking Pace</h3>
+                        <div class="score-bar-container">
+                            <div class="score-bar" id="bar-pace"></div>
+                        </div>
+                        <span class="score-num" id="score-pace">--</span>
+                    </div>
+                </div>
+
+                <!-- Feedback -->
+                <div class="feedback-section">
+                    <div class="feedback-col">
+                        <h3 class="feedback-title strengths-title">Strengths</h3>
+                        <ul id="strengths-list"></ul>
+                    </div>
+                    <div class="feedback-col">
+                        <h3 class="feedback-title improvements-title">Areas to Improve</h3>
+                        <ul id="improvements-list"></ul>
+                    </div>
+                </div>
+
+                <!-- Transcription -->
+                <div class="transcription-section">
+                    <h3>Transcription</h3>
+                    <div class="transcription-box" id="transcription-text"></div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-row">
+                    <div class="stat">
+                        <span class="stat-value" id="stat-words">--</span>
+                        <span class="stat-label">Words</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="stat-wpm">--</span>
+                        <span class="stat-label">Words/Min</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="stat-duration">--</span>
+                        <span class="stat-label">Duration (s)</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-value" id="stat-fillers">--</span>
+                        <span class="stat-label">Filler Words</span>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="new-analysis-btn">New Analysis</button>
+            </section>
+        </main>
+
+        <footer>
+            <p>Viva AI Performance Analyzer &mdash; Research Project &mdash; RTX 3050 GPU Accelerated</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/camera.js') }}"></script>
+</body>
+</html>

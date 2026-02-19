@@ -34,6 +34,18 @@ wheels/
 *.swo
 *~
 
+# Uploads and temporary files
+uploads/
+*.wav
+*.mp4
+*.avi
+
+# Model files
+*.task
+
+# Logs
+logs/
+
 # OS
 .DS_Store
 Thumbs.db
